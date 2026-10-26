@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Policy Studio | App Legal Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* CSS SECTION */
+    :root {
+      color-scheme: dark;
+      --page: #111719; --panel: #1a2225; --panel-raised: #202a2e;
+      --panel-soft: #182124; --text: #f1f6f5; --text-soft: #a7b6b5;
+      --muted: #7c8d8c; --line: #303d40; --accent: #64d9e8;
+      --accent-strong: #39c9dd; --accent-ink: #071719;
+      --error: #ff8f89; --success: #75d8a0; --shadow: 0 28px 80px rgb(0 0 0 / 20%);
+      font-family: "DM Sans", sans-serif;
+    }
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --page: #ffffff; --panel: #ffffff; --panel-raised: #f4f8f8;
+      --panel-soft: #f7fafa; --text: #162224; --text-soft: #506264;
+      --muted: #738385; --line: #dce6e7; --accent: #007f91;
+      --accent-strong: #00a8bc; --accent-ink: #ffffff;
+      --error: #b43f3a; --success: #1d8150; --shadow: 0 24px 70px rgb(35 72 76 / 9%);
+    }
+    * { box-sizing: border-box; }
+    body { min-height: 100vh; margin: 0; background: var(--page); color: var(--text); transition: background-color 180ms ease, color 180ms ease; }
+    button, input, select { font: inherit; }
+    button { color: inherit; cursor: pointer; }
+    [hidden] { display: none !important; }
+    
+    .topbar { height: 76px; padding: 0 22px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+    .brand { font: 800 19px "Manrope", sans-serif; color: var(--text); text-decoration: none; }
+    .brand span { color: var(--accent); }
+    
+    .app-shell { width: min(1120px, calc(100% - 48px)); margin: 0 auto; padding-bottom: 40px; }
+    .intro { padding: 40px 0 20px; }
+    .intro h1 { font: 700 36px "Manrope", sans-serif; margin: 10px 0; }
+    .intro h1 span { color: var(--accent); }
+    
+    .workspace { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
+    .workspace-top { padding: 25px 30px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); }
+    .workspace-top h2 { margin: 0; font: 700 20px "Manrope", sans-serif; }
+    
+    #policyForm { padding: 30px; display: flex; flex-direction: column; gap: 20px; }
+    .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+    .field span { font-size: 12px; font-weight: 600; color: var(--text-soft); }
+    .field input:not([type="checkbox"]):not([type="radio"]), .field select { width: 100%; height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-soft); color: var(--text); }
+    
+    .check-list, .service-grid, .radio-list { display: grid; gap: 10px; margin-top: 10px; }
+    .service-grid { grid-template-columns: 1fr 1fr; }
+    .check-option, .service-option, .radio-option { padding: 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel-soft); display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .check-option:has(input:checked), .service-option:has(input:checked), .radio-option:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--panel-soft)); }
+    .check-copy strong, .service-name, .radio-option strong { font-size: 13px; font-weight: 600; }
+    .check-copy small, .radio-option small { display: block; font-size: 11px; color: var(--muted); margin-top: 4px; }
+    
+    .form-footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; }
+    .button { padding: 0 20px; height: 40px; border-radius: 6px; font-weight: 700; border: none; transition: 0.2s; }
+    .button-primary { background: var(--accent); color: var(--accent-ink); }
+    .button-outline { border: 1px solid var(--line); background: transparent; color: var(--text); }
+    .button-primary:hover { opacity: 0.9; }
+    
+    .result-view { padding: 30px; }
+    .document-tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+    .document-tab { padding: 10px 0; background: none; border: none; color: var(--muted); font-weight: 700; font-size: 14px; border-bottom: 2px solid transparent; }
+    .document-tab.is-selected { color: var(--accent); border-bottom-color: var(--accent); }
+    .document-content { background: var(--panel-soft); padding: 20px; border-radius: 8px; max-height: 400px; overflow-y: auto; font-size: 14px; line-height: 1.6; }
+    
+    .result-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+    .field-error { color: var(--error); font-size: 12px; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#">Policy<span>Studio</span></a>
+    <button class="button button-outline" id="themeToggle">Toggle Theme</button>
+  </header>
+
+  <main class="app-shell">
+    <section class="intro">
+      <h1>Protect <span>Your App.</span></h1>
+      <p style="color: var(--text-soft)">Generate Privacy Policy & Terms and Conditions in one go. Download ready-to-host HTML files.</p>
+    </section>
+
+    <!-- FORM SECTION -->
+    <section class="workspace" id="wizardView">
+      <div class="workspace-top"><h2>App Details & Permissions</h2></div>
+      
+      <form id="policyForm">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <label class="field"><span>App / Game Name *</span><input id="appName" type="text" required></label>
+          <label class="field"><span>Developer / Company Name *</span><input id="developerName" type="text" required></label>
+          <label class="field"><span>Contact Email *</span><input id="contactEmail" type="email" required></label>
+          <label class="field"><span>App Model *</span>
+            <select id="appType" required>
+              <option value="Free">Free</option><option value="Freemium">Freemium</option><option value="Paid">Paid</option>
+            </select>
+          </label>
+        </div>
+
+        <h3 style="margin-top:20px; font-size: 16px;">What data do you access?</h3>
+        <div class="check-list">
+          <label class="check-option"><input type="checkbox" name="data" value="personal"><div class="check-copy"><strong>Personal Information</strong><small>Name, Email, Phone</small></div></label>
+          <label class="check-option"><input type="checkbox" name="data" value="location"><div class="check-copy"><strong>Location Data</strong><small>Background or precise location</small></div></label>
+          <label class="check-option"><input type="checkbox" name="data" value="camera"><div class="check-copy"><strong>Camera / Mic</strong><small>Audio/Video access</small></div></label>
+        </div>
+
+        <h3 style="margin-top:20px; font-size: 16px;">Third-Party Services</h3>
+        <div class="service-grid">
+          <label class="service-option"><input type="checkbox" name="service" value="admob"><span class="service-name">Google AdMob</span></label>
+          <label class="service-option"><input type="checkbox" name="service" value="firebaseAnalytics"><span class="service-name">Firebase Analytics</span></label>
+          <label class="service-option"><input type="checkbox" name="service" value="googlePlay" checked><span class="service-name">Google Play Services</span></label>
+          <label class="service-option"><input type="checkbox" name="service" value="unityAds"><span class="service-name">Unity Ads</span></label>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+          <div class="radio-list">
+            <span style="font-size: 12px; font-weight:600; color:var(--text-soft)">Target Audience *</span>
+            <label class="radio-option"><input type="radio" name="audience" value="13plus" checked><strong>For users 13+</strong></label>
+            <label class="radio-option"><input type="radio" name="audience" value="under13"><strong>Includes children under 13</strong></label>
+          </div>
+          <label class="field"><span>Effective Date *</span><input id="effectiveDate" type="date" required></label>
+        </div>
+
+        <div class="form-footer">
+          <button class="button button-primary" type="submit">Generate Documents</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- RESULT SECTION -->
+    <section class="workspace result-view" id="resultView" hidden>
+      <h2>Your Legal Documents</h2>
+      <div class="document-tabs">
+        <button class="document-tab is-selected" id="privacyTab" data-doc="privacy">Privacy Policy</button>
+        <button class="document-tab" id="termsTab" data-doc="terms">Terms & Conditions</button>
+      </div>
+      
+      <div class="document-content" id="documentContent"></div>
+      
+      <div class="result-actions">
+        <!-- DOWNLOAD BUTTON ADDED HERE -->
+        <button class="button button-primary" id="downloadHtmlButton">⬇ Download HTML File</button>
+        <button class="button button-outline" id="copyTextButton">Copy Text</button>
+        <button class="button button-outline" id="startOverButton">Start Over</button>
+      </div>
+      <p id="actionStatus" style="color: var(--success); font-size: 12px; margin-top: 10px;"></p>
+    </section>
+  </main>
+
+  <script>
+    /* JS SECTION */
+    const themeToggle = document.querySelector("#themeToggle");
+    themeToggle.addEventListener("click", () => {
+      const isDark = document.documentElement.dataset.theme !== "light";
+      document.documentElement.dataset.theme = isDark ? "light" : "dark";
+    });
+
+    const form = document.querySelector("#policyForm");
+    const wizardView = document.querySelector("#wizardView");
+    const resultView = document.querySelector("#resultView");
+    const documentContent = document.querySelector("#documentContent");
+    const statusMsg = document.querySelector("#actionStatus");
+    
+    let generatedDocs = { privacy: "", terms: "", appName: "" };
+    let currentDoc = "privacy";
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      
+      const appName = document.querySelector("#appName").value;
+      const devName = document.querySelector("#developerName").value;
+      const email = document.querySelector("#contactEmail").value;
+      const date = document.querySelector("#effectiveDate").value || new Date().toLocaleDateString();
+      const appType = document.querySelector("#appType").value;
+      
+      // Privacy Policy Logic
+      let privacyHTML = `<h1>Privacy Policy for ${appName}</h1><p><strong>Effective Date:</strong> ${date}</p>`;
+      privacyHTML += `<p>${devName} built the ${appName} app as a ${appType} app. This SERVICE is provided by ${devName} and is intended for use as is.</p>`;
+      privacyHTML += `<h2>Information Collection and Use</h2><p>For a better experience, we may require you to provide us with certain personally identifiable information.</p>`;
+      
+      const services = [...document.querySelectorAll('input[name="service"]:checked')].map(el => el.parentElement.innerText);
+      if(services.length > 0) {
+        privacyHTML += `<h2>Third-Party Services</h2><p>The app uses third-party services that may collect information used to identify you:</p><ul>`;
+        services.forEach(s => privacyHTML += `<li>${s}</li>`);
+        privacyHTML += `</ul>`;
+      }
+      privacyHTML += `<h2>Contact Us</h2><p>If you have questions, contact us at ${email}.</p>`;
+
+      // Terms and Conditions Logic (Ensured it's fully generated)
+      let termsHTML = `<h1>Terms & Conditions for ${appName}</h1><p><strong>Effective Date:</strong> ${date}</p>`;
+      termsHTML += `<p>By downloading or using the app, these terms will automatically apply to you. You should make sure therefore that you read them carefully before using the app.</p>`;
+      termsHTML += `<h2>License and Use</h2><p>You are not allowed to copy or modify the app, any part of the app, or our trademarks in any way.</p>`;
+      const audience = document.querySelector('input[name="audience"]:checked').value;
+      if(audience === "under13") {
+         termsHTML += `<h2>Children's Privacy (COPPA)</h2><p>This app includes features for children under 13. A parent or guardian must review these terms.</p>`;
+      }
+      termsHTML += `<h2>Changes to This Terms and Conditions</h2><p>We may update our Terms and Conditions from time to time. Thus, you are advised to review this page periodically for any changes.</p>`;
+      termsHTML += `<h2>Contact Us</h2><p>If you have any questions or suggestions, do not hesitate to contact us at ${email}.</p>`;
+
+      generatedDocs = { privacy: privacyHTML, terms: termsHTML, appName: appName };
+      
+      wizardView.hidden = true;
+      resultView.hidden = false;
+      renderDoc("privacy");
+    });
+
+    function renderDoc(type) {
+      currentDoc = type;
+      documentContent.innerHTML = generatedDocs[type];
+      document.querySelector("#privacyTab").classList.toggle("is-selected", type === "privacy");
+      document.querySelector("#termsTab").classList.toggle("is-selected", type === "terms");
+    }
+
+    document.querySelectorAll(".document-tab").forEach(tab => {
+      tab.addEventListener("click", (e) => renderDoc(e.target.dataset.doc));
+    });
+
+    document.querySelector("#startOverButton").addEventListener("click", () => {
+      form.reset();
+      resultView.hidden = true;
+      wizardView.hidden = false;
+      statusMsg.textContent = "";
+    });
+
+    document.querySelector("#copyTextButton").addEventListener("click", () => {
+      const text = documentContent.innerText;
+      navigator.clipboard.writeText(text).then(() => statusMsg.textContent = "Text Copied!");
+    });
+
+    // NEW FEATURE: Download HTML File directly
+    document.querySelector("#downloadHtmlButton").addEventListener("click", () => {
+      const fullHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>${generatedDocs.appName} - ${currentDoc === 'privacy' ? 'Privacy Policy' : 'Terms & Conditions'}</title>
+  <style>body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 20px; color: #333; }</style>
+</head>
+<body>
+  ${generatedDocs[currentDoc]}
+</body>
+</html>`;
+      
+      const blob = new Blob([fullHtml], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${generatedDocs.appName.replace(/\\s+/g, '_')}_${currentDoc}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      statusMsg.textContent = "HTML File Downloaded! You can now upload this file to your website.";
+    });
+  </script>
+</body>
+</html>
