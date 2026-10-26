@@ -3,11 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Policy Studio | App Legal Generator</title>
+  <title>Policy Studio | Professional App Legal Generator</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
-    /* CSS SECTION */
     :root {
       color-scheme: dark;
       --page: #111719; --panel: #1a2225; --panel-raised: #202a2e;
@@ -66,10 +65,9 @@
     .document-tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
     .document-tab { padding: 10px 0; background: none; border: none; color: var(--muted); font-weight: 700; font-size: 14px; border-bottom: 2px solid transparent; }
     .document-tab.is-selected { color: var(--accent); border-bottom-color: var(--accent); }
-    .document-content { background: var(--panel-soft); padding: 20px; border-radius: 8px; max-height: 400px; overflow-y: auto; font-size: 14px; line-height: 1.6; }
+    .document-content { background: var(--panel-soft); padding: 20px; border-radius: 8px; max-height: 450px; overflow-y: auto; font-size: 14px; line-height: 1.7; }
     
     .result-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-    .field-error { color: var(--error); font-size: 12px; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -80,18 +78,18 @@
 
   <main class="app-shell">
     <section class="intro">
-      <h1>Protect <span>Your App.</span></h1>
-      <p style="color: var(--text-soft)">Generate Privacy Policy & Terms and Conditions in one go. Download ready-to-host HTML files.</p>
+      <h1>Professional <span>Legal Generator.</span></h1>
+      <p style="color: var(--text-soft)">Generate detailed, store-compliant Privacy Policies & Terms with IronSource, AdMob, and Unity integrations.</p>
     </section>
 
     <!-- FORM SECTION -->
     <section class="workspace" id="wizardView">
-      <div class="workspace-top"><h2>App Details & Permissions</h2></div>
+      <div class="workspace-top"><h2>App Details & Ad Networks</h2></div>
       
       <form id="policyForm">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
           <label class="field"><span>App / Game Name *</span><input id="appName" type="text" required></label>
-          <label class="field"><span>Developer / Company Name *</span><input id="developerName" type="text" required></label>
+          <label class="field"><span>Developer / Studio Name *</span><input id="developerName" type="text" required></label>
           <label class="field"><span>Contact Email *</span><input id="contactEmail" type="email" required></label>
           <label class="field"><span>App Model *</span>
             <select id="appType" required>
@@ -105,14 +103,16 @@
           <label class="check-option"><input type="checkbox" name="data" value="personal"><div class="check-copy"><strong>Personal Information</strong><small>Name, Email, Phone</small></div></label>
           <label class="check-option"><input type="checkbox" name="data" value="location"><div class="check-copy"><strong>Location Data</strong><small>Background or precise location</small></div></label>
           <label class="check-option"><input type="checkbox" name="data" value="camera"><div class="check-copy"><strong>Camera / Mic</strong><small>Audio/Video access</small></div></label>
+          <label class="check-option"><input type="checkbox" name="data" value="device"><div class="check-copy"><strong>Device & Log Data</strong><small>IP address, crash logs, diagnostics</small></div></label>
         </div>
 
-        <h3 style="margin-top:20px; font-size: 16px;">Third-Party Services</h3>
+        <h3 style="margin-top:20px; font-size: 16px;">Third-Party Ad Networks & Services</h3>
         <div class="service-grid">
           <label class="service-option"><input type="checkbox" name="service" value="admob"><span class="service-name">Google AdMob</span></label>
+          <label class="service-option"><input type="checkbox" name="service" value="unityAds"><span class="service-name">Unity Ads</span></label>
+          <label class="service-option"><input type="checkbox" name="service" value="ironsource"><span class="service-name">IronSource (LevelPlay)</span></label>
           <label class="service-option"><input type="checkbox" name="service" value="firebaseAnalytics"><span class="service-name">Firebase Analytics</span></label>
           <label class="service-option"><input type="checkbox" name="service" value="googlePlay" checked><span class="service-name">Google Play Services</span></label>
-          <label class="service-option"><input type="checkbox" name="service" value="unityAds"><span class="service-name">Unity Ads</span></label>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
@@ -125,14 +125,14 @@
         </div>
 
         <div class="form-footer">
-          <button class="button button-primary" type="submit">Generate Documents</button>
+          <button class="button button-primary" type="submit">Generate Detailed Policy</button>
         </div>
       </form>
     </section>
 
     <!-- RESULT SECTION -->
     <section class="workspace result-view" id="resultView" hidden>
-      <h2>Your Legal Documents</h2>
+      <h2>Your Detailed Legal Documents</h2>
       <div class="document-tabs">
         <button class="document-tab is-selected" id="privacyTab" data-doc="privacy">Privacy Policy</button>
         <button class="document-tab" id="termsTab" data-doc="terms">Terms & Conditions</button>
@@ -141,7 +141,6 @@
       <div class="document-content" id="documentContent"></div>
       
       <div class="result-actions">
-        <!-- DOWNLOAD BUTTON ADDED HERE -->
         <button class="button button-primary" id="downloadHtmlButton">⬇ Download HTML File</button>
         <button class="button button-outline" id="copyTextButton">Copy Text</button>
         <button class="button button-outline" id="startOverButton">Start Over</button>
@@ -151,7 +150,6 @@
   </main>
 
   <script>
-    /* JS SECTION */
     const themeToggle = document.querySelector("#themeToggle");
     themeToggle.addEventListener("click", () => {
       const isDark = document.documentElement.dataset.theme !== "light";
@@ -175,30 +173,69 @@
       const email = document.querySelector("#contactEmail").value;
       const date = document.querySelector("#effectiveDate").value || new Date().toLocaleDateString();
       const appType = document.querySelector("#appType").value;
-      
-      // Privacy Policy Logic
-      let privacyHTML = `<h1>Privacy Policy for ${appName}</h1><p><strong>Effective Date:</strong> ${date}</p>`;
-      privacyHTML += `<p>${devName} built the ${appName} app as a ${appType} app. This SERVICE is provided by ${devName} and is intended for use as is.</p>`;
-      privacyHTML += `<h2>Information Collection and Use</h2><p>For a better experience, we may require you to provide us with certain personally identifiable information.</p>`;
+      const audience = document.querySelector('input[name="audience"]:checked').value;
       
       const services = [...document.querySelectorAll('input[name="service"]:checked')].map(el => el.parentElement.innerText);
-      if(services.length > 0) {
-        privacyHTML += `<h2>Third-Party Services</h2><p>The app uses third-party services that may collect information used to identify you:</p><ul>`;
-        services.forEach(s => privacyHTML += `<li>${s}</li>`);
-        privacyHTML += `</ul>`;
-      }
-      privacyHTML += `<h2>Contact Us</h2><p>If you have questions, contact us at ${email}.</p>`;
+      const dataCollected = [...document.querySelectorAll('input[name="data"]:checked')].map(el => el.parentElement.innerText);
 
-      // Terms and Conditions Logic (Ensured it's fully generated)
-      let termsHTML = `<h1>Terms & Conditions for ${appName}</h1><p><strong>Effective Date:</strong> ${date}</p>`;
-      termsHTML += `<p>By downloading or using the app, these terms will automatically apply to you. You should make sure therefore that you read them carefully before using the app.</p>`;
-      termsHTML += `<h2>License and Use</h2><p>You are not allowed to copy or modify the app, any part of the app, or our trademarks in any way.</p>`;
-      const audience = document.querySelector('input[name="audience"]:checked').value;
-      if(audience === "under13") {
-         termsHTML += `<h2>Children's Privacy (COPPA)</h2><p>This app includes features for children under 13. A parent or guardian must review these terms.</p>`;
-      }
-      termsHTML += `<h2>Changes to This Terms and Conditions</h2><p>We may update our Terms and Conditions from time to time. Thus, you are advised to review this page periodically for any changes.</p>`;
-      termsHTML += `<h2>Contact Us</h2><p>If you have any questions or suggestions, do not hesitate to contact us at ${email}.</p>`;
+      // Detailed Professional Privacy Policy
+      let privacyHTML = `
+        <h1>Privacy Policy for ${appName}</h1>
+        <p><strong>Effective Date:</strong> ${date}</p>
+        
+        <h2>1. Introduction</h2>
+        <p>${devName} ("we," "our," or "us") operates the ${appName} mobile application as a ${appType} service. This Privacy Policy informs you of our policies regarding the collection, use, and disclosure of personal data when you use our application and the choices you have associated with that data.</p>
+        <p>We use your data to provide and improve the service. By using the application, you agree to the collection and use of information in accordance with this policy.</p>
+
+        <h2>2. Information Collection and Use</h2>
+        <p>While using our application, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you. The types of data collected include:</p>
+        <ul>
+          ${dataCollected.length > 0 ? dataCollected.map(d => `<li>${d}</li>`).join('') : '<li>No direct personal information is collected by us.</li>'}
+        </ul>
+
+        <h2>3. Third-Party Ad Networks & Services</h2>
+        <p>Our application integrates third-party service providers and ad networks to display advertisements, analyze traffic, and ensure app stability. These third parties may collect information via device identifiers and cookies:</p>
+        <ul>
+          ${services.length > 0 ? services.map(s => `<li>${s}</li>`).join('') : '<li>Standard operating system services.</li>'}
+        </ul>
+        <p>These ad networks (such as Google AdMob, Unity Ads, and IronSource) may use information about your visits to this and other apps in order to provide relevant advertisements about goods and services of interest to you.</p>
+
+        <h2>4. Security of Data</h2>
+        <p>The security of your data is important to us, but remember that no method of transmission over the Internet, or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.</p>
+
+        <h2>5. Children's Privacy</h2>
+        <p>${audience === "under13" ? "This application includes features tailored for children under 13. We comply with COPPA regulations and do not knowingly collect personal information from children without proper parental consent." : "Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from children under 13."}</p>
+
+        <h2>6. Changes to This Privacy Policy</h2>
+        <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.</p>
+
+        <h2>7. Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy, please contact us by email: <strong>${email}</strong></p>
+      `;
+
+      // Detailed Professional Terms & Conditions
+      let termsHTML = `
+        <h1>Terms & Conditions for ${appName}</h1>
+        <p><strong>Effective Date:</strong> ${date}</p>
+
+        <h2>1. Agreement to Terms</h2>
+        <p>By downloading or using the ${appName} application, these terms will automatically apply to you. You should make sure therefore that you read them carefully before using the app.</p>
+
+        <h2>2. Intellectual Property Rights</h2>
+        <p>You are not allowed to copy, or modify the app, any part of the app, or our trademarks in any way. You are not allowed to attempt to extract the source code of the app, and you also shouldn't try to translate the app into other languages, or make derivative versions.</p>
+
+        <h2>3. Advertisements & In-App Purchases</h2>
+        <p>The app is supported by advertising revenues and may display ads and promotions. These advertisements may be targeted based on the information stored in your device or interaction with the app. Any virtual items or purchases made are governed by the respective app store's billing terms (Google Play Store / App Store).</p>
+
+        <h2>4. Limitation of Liability</h2>
+        <p>${devName} will not be held responsible if the app does not work at full functionality due to lack of data connectivity, device storage limitations, or operating system incompatibilities.</p>
+
+        <h2>5. Governing Law</h2>
+        <p>These terms shall be governed and construed in accordance with local laws, without regard to its conflict of law provisions.</p>
+
+        <h2>6. Contact Information</h2>
+        <p>If you have any queries regarding these Terms, please reach out at <strong>${email}</strong></p>
+      `;
 
       generatedDocs = { privacy: privacyHTML, terms: termsHTML, appName: appName };
       
@@ -230,14 +267,13 @@
       navigator.clipboard.writeText(text).then(() => statusMsg.textContent = "Text Copied!");
     });
 
-    // NEW FEATURE: Download HTML File directly
     document.querySelector("#downloadHtmlButton").addEventListener("click", () => {
       const fullHtml = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <title>${generatedDocs.appName} - ${currentDoc === 'privacy' ? 'Privacy Policy' : 'Terms & Conditions'}</title>
-  <style>body { font-family: sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 20px; color: #333; }</style>
+  <style>body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.8; max-width: 800px; margin: 40px auto; padding: 20px; color: #222; }</style>
 </head>
 <body>
   ${generatedDocs[currentDoc]}
@@ -248,13 +284,13 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${generatedDocs.appName.replace(/\\s+/g, '_')}_${currentDoc}.html`;
+      a.download = `${generatedDocs.appName.replace(/\s+/g, '_')}_${currentDoc}.html`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      statusMsg.textContent = "HTML File Downloaded! You can now upload this file to your website.";
+      statusMsg.textContent = "Detailed HTML File Downloaded Successfully!";
     });
   </script>
 </body>
